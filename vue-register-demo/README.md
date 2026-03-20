@@ -6,16 +6,17 @@
 
 ```
 vue-register-demo/
+├── public/
+│   ├── sensorsdata.js            # 神策 SDK 文件（从官方下载）
+│   └── sensorsdata-config.js     # 神策 SDK 初始化配置
 ├── src/
 │   ├── components/
-│   │   └── RegisterPage.vue    # 用户注册页面组件（包含完整的埋点逻辑）
-│   ├── utils/
-│   │   └── sensorsAnalytics.js # 神策 SDK 封装工具
-│   ├── App.vue                 # 应用根组件
-│   └── main.js                 # 应用入口（初始化神策 SDK）
-├── index.html                  # HTML 模板
-├── package.json                # 项目配置
-└── vite.config.js              # Vite 配置
+│   │   └── RegisterPage.vue      # 用户注册页面组件（包含完整的埋点逻辑）
+│   ├── App.vue                   # 应用根组件
+│   └── main.js                   # 应用入口
+├── index.html                    # HTML 模板（引入神策 SDK）
+├── package.json                  # 项目配置
+└── vite.config.js                # Vite 配置
 ```
 
 ## 快速开始
@@ -29,15 +30,16 @@ npm install
 
 ### 2. 配置神策信息
 
-编辑 `src/utils/sensorsAnalytics.js` 文件，修改以下配置：
+编辑 `public/sensorsdata-config.js` 文件，修改以下配置：
 
 ```javascript
-const SA_CONFIG = {
-  projectId: 'YOUR_PROJECT_ID',      // 替换为你的神策项目 ID
-  serverUrl: 'YOUR_SERVER_URL',      // 替换为你的神策数据接收地址
-  showLog: true,                     // 生产环境建议设为 false
-}
+sensors.init({
+  server_url: 'http://your-server-url/sa?token=xxxxx&project=xxxxxx',
+  // 其他配置...
+})
 ```
+
+**重要**: 将 `server_url` 替换为你的神策数据接收地址。
 
 ### 3. 启动开发服务器
 
@@ -56,8 +58,8 @@ npm run build
 ### 自动采集的埋点事件
 
 1. **页面浏览事件** (`$pageview`)
-   - 页面加载时自动触发
-   - 包含页面名称、页面类型等属性
+   - 页面加载时自动触发（通过 `sensors.quick('autoTrack')`）
+   - 单页面应用会自动追踪 URL 变化
 
 2. **表单字段交互** (`form_field_blur`)
    - 用户在输入框失焦时触发
@@ -83,7 +85,7 @@ npm run build
 
 8. **注册成功** (`register_success`)
    - 注册成功后触发
-   - 同时调用 `sensors.login()` 设置登录用户
+   - 同时调用 `sensors.login()` 设置登录用户 ID
 
 9. **注册失败** (`register_failed`)
    - 注册失败时触发
@@ -92,46 +94,55 @@ npm run build
 10. **跳转登录** (`go_to_login_link_click`)
     - 用户点击"立即登录"链接时触发
 
+### 神策 SDK 配置说明
+
+在 `public/sensorsdata-config.js` 中，可以配置以下选项：
+
+- `server_url`: 神策数据接收地址（必填）
+- `is_track_single_page`: 是否开启单页面追踪（默认 true）
+- `use_client_time`: 是否使用客户端时间（默认 true）
+- `send_type`: 数据发送方式（'beacon' | 'ajax' | 'image'）
+- `heatmap.clickmap`: 是否开启点击图（'default' | 'not_collect'）
+- `heatmap.scroll_notice_map`: 是否开启触达图（'default' | 'not_collect'）
+
 ### 手动添加埋点
 
-在组件中导入并使用 `trackEvent` 函数：
+在组件中使用全局的 `sensors` 对象：
 
 ```javascript
-import { trackEvent } from '../utils/sensorsAnalytics'
+// 在 Vue 组件中
+const sensors = window.sensorsDataAnalytic201505
 
 // 追踪自定义事件
-trackEvent('custom_event_name', {
+sensors.track('custom_event_name', {
   property1: 'value1',
   property2: 'value2',
 })
-```
 
-### 设置用户信息
+// 设置用户 ID（登录后）
+sensors.login('user_id')
 
-```javascript
-import { setLoginUser } from '../utils/sensorsAnalytics'
-
-// 用户登录成功后
-setLoginUser(userId, {
+// 设置用户属性
+sensors.register({
   username: '用户名',
   email: '邮箱',
   phone: '手机号',
-  // 其他用户画像属性
 })
 ```
 
 ## 注意事项
 
-1. **神策配置**: 务必将 `projectId` 和 `serverUrl` 替换为你自己的神策项目配置
-2. **调试模式**: 生产环境请将 `showLog` 设置为 `false`
-3. **隐私合规**: 确保你的埋点方案符合相关隐私法规要求
-4. **错误处理**: 神策 SDK 加载失败不会影响应用正常运行
+1. **神策配置**: 务必将 `server_url` 替换为你自己的神策数据接收地址
+2. **调试模式**: 生产环境请根据需要调整日志输出
+3. **隐私合规**: 确保你的埋点方案符合相关隐私法规要求（如 GDPR、个人信息保护法等）
+4. **SDK 加载**: 神策 SDK 通过 `<script>` 标签在页面头部加载，确保在网络正常环境下使用
+5. **用户信息采集**: 避免在埋点中直接传输敏感信息（如密码、完整手机号等）
 
 ## 技术栈
 
 - Vue 3 (Composition API)
 - Vite 5
-- 神策数据分析 JavaScript SDK
+- 神策数据分析 JavaScript SDK (sa-sdk-javascript)
 
 ## 许可证
 

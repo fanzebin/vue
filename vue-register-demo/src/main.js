@@ -1,13 +1,4 @@
-import { initSensorsAnalytics } from './utils/sensorsAnalytics'
-
-// 在应用启动时初始化神策 SDK
-initSensorsAnalytics()
-  .then(() => {
-    console.log('神策 SDK 初始化完成')
-  })
-  .catch((error) => {
-    console.error('神策 SDK 初始化失败:', error)
-  })
+// 神策 SDK 通过 index.html 中的 script 标签引入，无需在此初始化
 
 import { createApp } from 'vue'
 import App from './App.vue'

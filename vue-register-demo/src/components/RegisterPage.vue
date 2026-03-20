@@ -114,7 +114,28 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { trackEvent, setLoginUser } from '../utils/sensorsAnalytics'
+
+// 神策 SDK 全局对象（通过 script 标签引入）
+const sensors = window.sensorsDataAnalytic201505
+
+// 封装埋点函数，确保 SDK 加载后再调用
+function trackEvent(eventName, properties = {}) {
+  if (sensors && typeof sensors.track === 'function') {
+    sensors.track(eventName, properties)
+  } else {
+    console.log('[Sensors] SDK not loaded, event:', eventName, properties)
+  }
+}
+
+// 设置登录用户信息
+function setLoginUser(userId, properties = {}) {
+  if (sensors && typeof sensors.login === 'function') {
+    sensors.login(userId)
+  }
+  if (sensors && typeof sensors.register === 'function') {
+    sensors.register(properties)
+  }
+}
 
 // 表单数据
 const formData = reactive({
