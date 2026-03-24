@@ -110,8 +110,10 @@ function initCaptcha() {
   isVerified.value = false
   isFailed.value = false
   sliderPosition.value = 0
-  gapPosition.value = Math.floor(Math.random() * 200) + 80 // 80-280px
-  gapTop.value = Math.floor(Math.random() * 100) + 40 // 40-140px
+  // 缺口位置范围：距离左边 60% - 90% 的位置（对应轨道宽度约 280px）
+  const trackWidth = 280
+  gapPosition.value = Math.floor(Math.random() * (trackWidth * 0.3)) + (trackWidth * 0.6) // 168-252px
+  gapTop.value = Math.floor(Math.random() * 80) + 40 // 40-120px
   backgroundImage.value = generateRandomBackground()
   showTip.value = false
 }
