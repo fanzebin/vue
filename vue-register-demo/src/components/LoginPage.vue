@@ -339,8 +339,13 @@ async function handleSubmit() {
 .login-container {
   position: relative;
   width: 100%;
-  max-width: 480px;
+  max-width: 1400px;
+  margin: 0 auto;
   padding: 40px 20px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 100vh;
   z-index: 1;
 }
 
@@ -439,6 +444,8 @@ async function handleSubmit() {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   padding: 48px 40px;
   border: 1px solid rgba(255, 255, 255, 0.3);
+  width: 100%;
+  max-width: 480px;
 }
 
 .login-header {
