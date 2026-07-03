@@ -1,11 +1,11 @@
 <template>
   <div id="app">
-    <LoginPage />
+    <OBDisasterRecoveryDashboard />
   </div>
 </template>
 
 <script setup>
-import LoginPage from './components/LoginPage.vue'
+import OBDisasterRecoveryDashboard from './components/OBDisasterRecoveryDashboard.vue'
 </script>
 
 <style>
@@ -17,16 +17,12 @@ import LoginPage from './components/LoginPage.vue'
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background-color: #f5f5f5;
+  background-color: #1a1a2e;
   overflow-x: hidden;
 }
 
 #app {
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  position: relative;
+  width: 100%;
 }
 </style>
