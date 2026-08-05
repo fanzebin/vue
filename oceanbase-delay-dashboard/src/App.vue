@@ -83,6 +83,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { Chart } from '@antv/g2'
 import * as datavVue3 from 'datav-vue3'
+import { Graph } from '@antv/g6'
 
 // 原始数据
 const rawData = {
@@ -366,7 +367,7 @@ const getDelayWidth = (property) => {
 }
 
 // 初始化地图拓扑图
-let mapChart = null
+let mapGraph = null
 const initMapChart = () => {
   if (!mapChartRef.value) return
   
@@ -383,9 +384,10 @@ const initMapChart = () => {
         
         if (!nodeSet.has(fromKey)) {
           nodes.push({
+            id: path.from.local,
             name: path.from.local,
             cluster: path.from.clusterName,
-            role: path.from.role,
+            role: path.from.role || 'UNKNOWN',
             value: 1
           })
           nodeSet.add(fromKey)
@@ -393,9 +395,10 @@ const initMapChart = () => {
         
         if (!nodeSet.has(toKey)) {
           nodes.push({
+            id: path.to.local,
             name: path.to.local,
             cluster: path.to.clusterName,
-            role: path.to.role,
+            role: path.to.role || 'UNKNOWN',
             value: 1
           })
           nodeSet.add(toKey)
@@ -411,31 +414,48 @@ const initMapChart = () => {
     })
   })
   
-  mapChart = new Chart({
+  // 使用 G6 创建拓扑图
+  mapGraph = new Graph({
     container: mapChartRef.value,
-    autoFit: true,
-    height: 400
+    width: mapChartRef.value.offsetWidth,
+    height: 400,
+    data: {
+      nodes,
+      edges
+    },
+    layout: {
+      type: 'force',
+      preventOverlap: true,
+      linkDistance: 150,
+      nodeStrength: -500,
+      edgeStrength: 0.1
+    },
+    node: {
+      style: {
+        fill: '#37cfe8',
+        stroke: '#ffd700',
+        lineWidth: 2,
+        size: 50,
+        labelText: d => d.name,
+        labelFill: '#fff',
+        labelFontSize: 12
+      }
+    },
+    edge: {
+      style: {
+        stroke: d => {
+          const val = d.value || 0
+          if (val < 0.3) return '#67e68b'
+          if (val < 0.6) return '#facc14'
+          return '#f87171'
+        },
+        lineWidth: 2,
+        endArrow: true
+      }
+    }
   })
   
-  mapChart.data(edges)
-  
-  mapChart
-    .edge()
-    .encode('source', d => d.source)
-    .encode('target', d => d.target)
-    .encode('color', d => d.value)
-    .scale('color', {
-      range: ['#67e68b', '#facc14', '#f87171'],
-      domain: [0, 0.5, 1]
-    })
-    .style('lineWidth', 2)
-    .legend('color', {
-      type: 'size',
-      title: '延时 (s)',
-      layout: { x: 'center', y: 'bottom' }
-    })
-  
-  mapChart.render()
+  mapGraph.render()
 }
 
 // 初始化趋势图
@@ -494,8 +514,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (mapChart) {
-    mapChart.destroy()
+  if (mapGraph) {
+    mapGraph.destroy()
   }
   if (trendChart) {
     trendChart.destroy()
